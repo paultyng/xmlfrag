@@ -54,13 +54,18 @@ type xmlDecoderParser struct {
 // New returns a value implementing the Parser interface for the given
 // configuration.
 func New(conf *Config) Parser {
+	root := conf.Root
+	if root == "" {
+		root = conf.Body
+	}
+
 	headers := make(map[string]bool, len(conf.Headers))
 	for _, h := range conf.Headers {
 		headers[h] = true
 	}
 
 	return &xmlDecoderParser{
-		root:    conf.Root,
+		root:    root,
 		body:    conf.Body,
 		headers: headers,
 	}

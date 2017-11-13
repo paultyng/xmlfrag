@@ -57,7 +57,6 @@ func TestParse(t *testing.T) {
 				</item>
 			</list>`,
 			&xmlfrag.Config{
-				Root: "item",
 				Body: "item",
 			},
 			[]xmlfrag.Fragment{
