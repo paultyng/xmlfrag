@@ -1,0 +1,24 @@
+{
+  "LineLength": 120,
+  "Enable": [
+    "deadcode",
+    "errcheck",
+    "gas",
+    "goconst",
+    "gocyclo",
+    "gofmt",
+    "golint",
+    "ineffassign",
+    "interfacer",
+    "lll",
+    "megacheck",
+    "misspell",
+    "staticcheck",
+    "structcheck",
+    "unconvert",
+    "unused",
+    "varcheck",
+    "vet",
+    "vetshadow"
+  ]
+}
