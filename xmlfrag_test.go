@@ -15,18 +15,35 @@ import (
 	"github.com/paultyng/xmlfrag"
 )
 
-func newStartElement(local string) xml.StartElement {
+func attrValues(values ...string) []xml.Attr {
+	if len(values)%2 != 0 {
+		panic("values must have an even number of values")
+	}
+	attr := make([]xml.Attr, 0, len(values)/2)
+	for i := 0; i < len(values)/2; i += 2 {
+		attr = append(attr, xml.Attr{
+			Name: xml.Name{
+				Local: values[i],
+			},
+			Value: values[i+1],
+		})
+	}
+	return attr
+}
+
+func newStartElement(local string, attr ...string) xml.StartElement {
 	return xml.StartElement{
 		Name: xml.Name{Local: local},
-		Attr: []xml.Attr{},
+		Attr: attrValues(attr...),
 	}
 }
 
-func newNode(local, innerXML, chardata string) xmlfrag.Element {
+func newFragment(local, innerXML, chardata string, attr ...string) xmlfrag.Element {
 	return xmlfrag.Element{
 		XMLName:  xml.Name{Local: local},
 		InnerXML: innerXML,
 		Chardata: chardata,
+		Attr:     attrValues(attr...),
 	}
 }
 
@@ -44,6 +61,21 @@ func TestParse(t *testing.T) {
 		conf     *xmlfrag.Config
 		expected []xmlfrag.Fragment
 	}{
+		{
+			`<head attr="value">
+				<foo>bar</foo>
+			</head>`,
+			&xmlfrag.Config{
+				Body: "head",
+			},
+			[]xmlfrag.Fragment{
+				{
+					Root:    newStartElement("head", "attr", "value"),
+					Headers: []xmlfrag.Element{},
+					Body:    newFragment("head", "<foo>bar</foo>", "", "attr", "value"),
+				},
+			},
+		},
 		{
 			`<list>
 				<item>
@@ -63,12 +95,12 @@ func TestParse(t *testing.T) {
 				{
 					Root:    newStartElement("item"),
 					Headers: []xmlfrag.Element{},
-					Body:    newNode("item", "<foo>foo1</foo><bar><baz>baz1</baz></bar>", ""),
+					Body:    newFragment("item", "<foo>foo1</foo><bar><baz>baz1</baz></bar>", ""),
 				},
 				{
 					Root:    newStartElement("item"),
 					Headers: []xmlfrag.Element{},
-					Body:    newNode("item", "<foo>foo2</foo>", ""),
+					Body:    newFragment("item", "<foo>foo2</foo>", ""),
 				},
 			},
 		},
@@ -104,25 +136,25 @@ func TestParse(t *testing.T) {
 				{
 					Root: newStartElement("rootTag"),
 					Headers: []xmlfrag.Element{
-						newNode("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
+						newFragment("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
 					},
-					Body: newNode("body", "foo1", "foo1"),
+					Body: newFragment("body", "foo1", "foo1"),
 				},
 				{
 					Root: newStartElement("rootTag"),
 					Headers: []xmlfrag.Element{
-						newNode("head1", "<name>head1name</name><value>head1value</value>", ""),
-						newNode("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
+						newFragment("head1", "<name>head1name</name><value>head1value</value>", ""),
+						newFragment("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
 					},
-					Body: newNode("body", "foo2", "foo2"),
+					Body: newFragment("body", "foo2", "foo2"),
 				},
 				{
 					Root: newStartElement("rootTag"),
 					Headers: []xmlfrag.Element{
-						newNode("head1", "<name>head1name</name><value>head1value</value>", ""),
-						newNode("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
+						newFragment("head1", "<name>head1name</name><value>head1value</value>", ""),
+						newFragment("head2", "<name attr=\"head2attr\">head2name</name><value>head2value</value>", ""),
 					},
-					Body: newNode("body", "foo3", "foo3"),
+					Body: newFragment("body", "foo3", "foo3"),
 				},
 			},
 		},

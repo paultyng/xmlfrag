@@ -8,10 +8,19 @@ import (
 
 // Element represents the data of an XML element.
 type Element struct {
-	InnerXML string   `xml:",innerxml"`
-	Chardata string   `xml:",chardata"`
-	Comment  string   `xml:",comment"`
-	XMLName  xml.Name `xml:",name"`
+	InnerXML string
+	Chardata string
+	Comment  string
+	XMLName  xml.Name
+	Attr     []xml.Attr
+}
+
+type unmarshalElement struct {
+	InnerXML string     `xml:",innerxml"`
+	Chardata string     `xml:",chardata"`
+	Comment  string     `xml:",comment"`
+	XMLName  xml.Name   `xml:",name"`
+	Attr     []xml.Attr `xml:"-"`
 }
 
 // Fragment represents the collected fragment data parsed from the decoder.
@@ -77,6 +86,16 @@ func (p *xmlDecoderParser) Parse(d Decoder, cb FragmentFunc) error {
 	return p.parseFragments(d, cb)
 }
 
+func decodeElement(d Decoder, s *xml.StartElement) (Element, error) {
+	var el unmarshalElement
+	err := d.DecodeElement(&el, s)
+	if err != nil {
+		return Element{}, err
+	}
+	el.Attr = append(make([]xml.Attr, 0, len(s.Attr)), s.Attr...)
+	return Element(el), nil
+}
+
 // nolint: gocyclo
 func (p *xmlDecoderParser) parseFragments(d Decoder, cb FragmentFunc) error {
 	var template *Fragment
@@ -101,8 +120,7 @@ func (p *xmlDecoderParser) parseFragments(d Decoder, cb FragmentFunc) error {
 		}
 
 		if p.headers[el.Name.Local] {
-			var n Element
-			err := d.DecodeElement(&n, el)
+			n, err := decodeElement(d, el)
 			if err != nil {
 				return err
 			}
@@ -115,7 +133,7 @@ func (p *xmlDecoderParser) parseFragments(d Decoder, cb FragmentFunc) error {
 				Root:    template.Root,
 				Headers: template.Headers,
 			}
-			err := d.DecodeElement(&f.Body, el)
+			f.Body, err = decodeElement(d, el)
 			if err != nil {
 				return err
 			}
