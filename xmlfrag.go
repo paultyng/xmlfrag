@@ -7,10 +7,10 @@ import (
 )
 
 type unmarshalElement struct {
-	InnerXML string     `xml:",innerxml"`
-	Chardata string     `xml:",chardata"`
-	Comment  string     `xml:",comment"`
-	XMLName  xml.Name   `xml:",name"`
+	InnerXML string `xml:",innerxml"`
+	Chardata string `xml:",chardata"`
+	Comment  string `xml:",comment"`
+	XMLName  xml.Name
 	Attr     []xml.Attr `xml:"-"`
 }
 
@@ -53,7 +53,13 @@ func decodeElement(d Decoder, s *xml.StartElement) (Element, error) {
 		return Element{}, err
 	}
 	el.Attr = append(make([]xml.Attr, 0, len(s.Attr)), s.Attr...)
-	return Element(el), nil
+	return Element{
+		Attr:     el.Attr,
+		Chardata: el.Chardata,
+		Comment:  el.Comment,
+		InnerXML: el.InnerXML,
+		Name:     el.XMLName,
+	}, nil
 }
 
 // nolint: gocyclo

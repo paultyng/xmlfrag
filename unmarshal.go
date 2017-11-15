@@ -7,14 +7,14 @@ import (
 
 func (el Element) start() xml.StartElement {
 	return xml.StartElement{
-		Name: el.XMLName,
+		Name: el.Name,
 		Attr: el.Attr,
 	}
 }
 
 func (el Element) end() xml.EndElement {
 	return xml.EndElement{
-		Name: el.XMLName,
+		Name: el.Name,
 	}
 }
 

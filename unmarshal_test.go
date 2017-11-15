@@ -25,7 +25,7 @@ func TestElementUnmarshal(t *testing.T) {
 		}
 		actual := &simple{}
 		assert.NoError(t, Element{
-			XMLName:  xml.Name{Local: "Root"},
+			Name:     xml.Name{Local: "Root"},
 			InnerXML: "<foo>foo1</foo><bar>bar1</bar>",
 		}.Unmarshal(actual))
 		assert.Equal(t, expected, actual)
@@ -38,7 +38,7 @@ func TestElementUnmarshal(t *testing.T) {
 		}
 		actual := &complex{}
 		assert.NoError(t, Element{
-			XMLName: xml.Name{Local: "Root"},
+			Name: xml.Name{Local: "Root"},
 			Attr: []xml.Attr{
 				{Name: xml.Name{Local: "foo"}, Value: "foo1"},
 			},

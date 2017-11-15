@@ -40,7 +40,7 @@ func newStartElement(local string, attr ...string) xml.StartElement {
 
 func newFragment(local, innerXML, chardata string, attr ...string) xmlfrag.Element {
 	return xmlfrag.Element{
-		XMLName:  xml.Name{Local: local},
+		Name:     xml.Name{Local: local},
 		InnerXML: innerXML,
 		Chardata: chardata,
 		Attr:     attrValues(attr...),

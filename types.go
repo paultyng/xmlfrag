@@ -7,7 +7,7 @@ type Element struct {
 	InnerXML string
 	Chardata string
 	Comment  string
-	XMLName  xml.Name
+	Name     xml.Name
 	Attr     []xml.Attr
 }
 
