@@ -43,6 +43,5 @@ func (el Element) Unmarshal(v interface{}) error {
 	}
 	enc.EncodeToken(el.end())
 	enc.Flush()
-	println(string(buf.Bytes()))
 	return xml.Unmarshal(buf.Bytes(), v)
 }
