@@ -30,8 +30,13 @@ type Parser interface {
 // Config represents the configuration options the Parser uses to fragment
 // the XML document.
 type Config struct {
-	Root    string
-	Body    string
+	// Root is the local name of the root element (optional, if unset, will be
+	// set to the same value as Body).
+	Root string
+	// Body is local name of the element matched for each fragment.
+	Body string
+	// Headers is the list of parent elements between Root and Body you want
+	// captured on the Fragment.
 	Headers []string
 }
 
